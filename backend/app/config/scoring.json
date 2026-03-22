@@ -1,0 +1,25 @@
+{
+  "commercial": {
+    "max_possible": 20,
+    "min_possible": -20
+  },
+  "execution": {
+    "cashflow_weeks_buffer": 4,
+    "survival_months_min": 3,
+    "jobsize_ratio_max": 2.5,
+    "weights": {
+      "profit_pass": 5,
+      "profit_fail": -5,
+      "cashflow_pass": 10,
+      "cashflow_fail": -10,
+      "survival_pass": 5,
+      "survival_fail": -10,
+      "jobsize_pass": 5,
+      "jobsize_fail": -5
+    }
+  },
+  "overall": {
+    "excellent_commercial_min": 10,
+    "excellent_execution_min": 15
+  }
+}

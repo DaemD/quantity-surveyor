@@ -1,0 +1,196 @@
+{
+  "sections": [
+    {
+      "id": "commercial",
+      "title": "Commercial Risk Assessment",
+      "description": "Answer based on the contract terms you have received.",
+      "type": "scored_radio",
+      "questions": [
+        {
+          "id": "priceFirmness",
+          "label": "Price Firmness",
+          "help": "How fixed is the contract price?",
+          "options": [
+            { "label": "Fully Fixed Price (High Risk)", "value": -2 },
+            { "label": "Fixed with some adjustment clauses", "value": -1 },
+            { "label": "Standard fluctuations allowed", "value": 0 },
+            { "label": "Cost Plus / Open Book (Low Risk)", "value": 2 }
+          ]
+        },
+        {
+          "id": "paymentTerms",
+          "label": "Payment Terms",
+          "help": "How quickly will you be paid after invoice?",
+          "options": [
+            { "label": ">60 Days or Pay When Paid", "value": -2 },
+            { "label": "45-60 Days", "value": -1 },
+            { "label": "Standard 30 Days", "value": 0 },
+            { "label": "7-14 Days (Excellent)", "value": 2 }
+          ]
+        },
+        {
+          "id": "deposit",
+          "label": "Deposit / Upfront Payments",
+          "help": "Is there any mobilisation payment or deposit?",
+          "options": [
+            { "label": "None, high retention (10%)", "value": -2 },
+            { "label": "Standard (5% retention, no deposit)", "value": 0 },
+            { "label": "Deposit covers materials", "value": 1 },
+            { "label": "Substantial upfront payment", "value": 2 }
+          ]
+        },
+        {
+          "id": "variations",
+          "label": "Handling of Variations",
+          "help": "How are changes to scope managed?",
+          "options": [
+            { "label": "Requires prior written signoff, rigid", "value": -2 },
+            { "label": "Standard process", "value": 0 },
+            { "label": "Flexible, site instructions paid", "value": 2 }
+          ]
+        },
+        {
+          "id": "programmeRisk",
+          "label": "Programme & Delay Damages (LADs)",
+          "help": "What are the consequences of programme overrun?",
+          "options": [
+            { "label": "Heavy LADs, tight programme", "value": -2 },
+            { "label": "Standard LADs, realistic timeframe", "value": 0 },
+            { "label": "No LADs, open programme", "value": 2 }
+          ]
+        },
+        {
+          "id": "designCompleteness",
+          "label": "Design Completeness",
+          "help": "How complete is the design at tender stage?",
+          "options": [
+            { "label": "Conceptual / Many unknowns", "value": -2 },
+            { "label": "Mostly designed (80%)", "value": 0 },
+            { "label": "Fully designed and coordinated", "value": 2 }
+          ]
+        },
+        {
+          "id": "provisionalSums",
+          "label": "Provisional Sums",
+          "help": "What proportion of the contract is undefined?",
+          "options": [
+            { "label": "Many undefined sums >20% of contract", "value": -2 },
+            { "label": "Standard 5-10%", "value": 0 },
+            { "label": "None, fully measured", "value": 2 }
+          ]
+        },
+        {
+          "id": "materialSupply",
+          "label": "Material Supply Risk",
+          "help": "Who bears the risk for material procurement?",
+          "options": [
+            { "label": "Contractor supplies all, long lead items", "value": -2 },
+            { "label": "Standard mix", "value": 0 },
+            { "label": "Client free issue / supplied", "value": 2 }
+          ]
+        },
+        {
+          "id": "weatherSensitivity",
+          "label": "Site & Weather Restrictions",
+          "help": "How exposed is the site and what access restrictions exist?",
+          "options": [
+            { "label": "Highly exposed, restricted hours", "value": -2 },
+            { "label": "Standard site conditions", "value": 0 },
+            { "label": "Indoors / Unrestricted access", "value": 2 }
+          ]
+        },
+        {
+          "id": "jobSize",
+          "label": "Contract Size Relative to Normal",
+          "help": "How does this contract compare to your typical work?",
+          "options": [
+            { "label": "Over 2x your normal contract size", "value": -2 },
+            { "label": "Slightly larger than normal", "value": -1 },
+            { "label": "Normal bread and butter job", "value": 1 },
+            { "label": "Smaller, easily manageable", "value": 2 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "execution",
+      "title": "Financial Reality Check",
+      "description": "Enter your actual numbers for this job and your company.",
+      "type": "numeric",
+      "questions": [
+        {
+          "id": "avgContractSize",
+          "label": "Your Average Contract Size",
+          "prefix": "£",
+          "default": 50000,
+          "group": "company",
+          "groupLabel": "Your Company Profile"
+        },
+        {
+          "id": "targetMargin",
+          "label": "Target Profit Margin",
+          "suffix": "%",
+          "default": 15,
+          "group": "company",
+          "groupLabel": "Your Company Profile"
+        },
+        {
+          "id": "monthlyFixedCosts",
+          "label": "Monthly Fixed Costs (Overheads)",
+          "prefix": "£",
+          "default": 10000,
+          "group": "company",
+          "groupLabel": "Your Company Profile"
+        },
+        {
+          "id": "cashReserves",
+          "label": "Available Cash Reserves",
+          "prefix": "£",
+          "default": 30000,
+          "group": "company",
+          "groupLabel": "Your Company Profile"
+        },
+        {
+          "id": "contractValue",
+          "label": "This Job – Contract Value",
+          "prefix": "£",
+          "default": 100000,
+          "group": "job",
+          "groupLabel": "This Job's Details"
+        },
+        {
+          "id": "totalCost",
+          "label": "Total Expected Cost (Labour + Materials)",
+          "prefix": "£",
+          "default": 85000,
+          "group": "job",
+          "groupLabel": "This Job's Details"
+        },
+        {
+          "id": "durationWeeks",
+          "label": "Estimated Duration",
+          "suffix": "weeks",
+          "default": 12,
+          "group": "job",
+          "groupLabel": "This Job's Details"
+        },
+        {
+          "id": "worstCaseOverrunCost",
+          "label": "Worst-Case Overrun Cost",
+          "prefix": "£",
+          "default": 15000,
+          "group": "worstcase",
+          "groupLabel": "Worst-Case Scenario"
+        },
+        {
+          "id": "worstCaseOverrunTime",
+          "label": "Worst-Case Extra Time",
+          "suffix": "weeks",
+          "default": 4,
+          "group": "worstcase",
+          "groupLabel": "Worst-Case Scenario"
+        }
+      ]
+    }
+  ]
+}
