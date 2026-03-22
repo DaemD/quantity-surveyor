@@ -14,10 +14,8 @@ app = FastAPI(
     version="1.0.0",
 )
 
-_cors_origins = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:3000"
-).split(",")
+_default_origins = "http://localhost:5173,http://localhost:3000,https://tranquil-embrace-production-2cb3.up.railway.app"
+_cors_origins = os.getenv("ALLOWED_ORIGINS", _default_origins).split(",")
 
 app.add_middleware(
     CORSMiddleware,
