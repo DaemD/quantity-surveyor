@@ -1,7 +1,12 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import auth, assessments, questions
+
+# Log the DB host at startup so we can confirm the env var is set
+_db_url = os.getenv("DATABASE_URL", "NOT SET - using localhost fallback")
+print(f"[startup] DATABASE_URL = {_db_url[:40]}..." if len(_db_url) > 40 else f"[startup] DATABASE_URL = {_db_url}")
 
 app = FastAPI(
     title="QS Ai API",
