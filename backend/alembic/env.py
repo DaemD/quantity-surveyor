@@ -24,6 +24,12 @@ from app.models.assessment import Assessment  # noqa: E402, F401
 target_metadata = Base.metadata
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/qsai")
+
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
