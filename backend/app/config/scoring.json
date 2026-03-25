@@ -1,25 +1,94 @@
 {
-  "commercial": {
-    "max_possible": 20,
-    "min_possible": -20
+  "job_quality": {
+    "thresholds": {
+      "excellent": 75,
+      "good": 55,
+      "marginal": 35
+    },
+    "factors": {
+      "price_firmness": {
+        "max": 10,
+        "values": { "very_firm": 10, "reasonably_firm": 7, "early_estimate": 3, "very_rough": 0 }
+      },
+      "payment_terms": {
+        "max": 10,
+        "values": { "weekly_monthly": 10, "stage_payments": 7, "end_of_job": 3, "dayworks_cost_plus": 8 }
+      },
+      "upfront_payment": {
+        "max": 5,
+        "values": { "yes": 5, "unsure": 3, "no": 0 }
+      },
+      "variations": {
+        "max": 10,
+        "values": { "written_before": 10, "written_after": 7, "verbal": 3, "no_process": 0 }
+      },
+      "delay_damages": {
+        "max": 5,
+        "values": { "no": 5, "unsure": 3, "yes": 0 }
+      },
+      "programme_risk": {
+        "max": 5,
+        "values": { "client": 5, "shared": 3, "contractor": 1, "unsure": 2 }
+      },
+      "design_status": {
+        "max": 10,
+        "values": { "fully_defined": 10, "mostly_defined": 7, "gaps": 3, "largely_undefined": 0 }
+      },
+      "provisional_sums": {
+        "max": 5,
+        "values": { "none": 5, "minor": 3, "significant": 0, "unsure": 2 }
+      },
+      "material_supply": {
+        "max": 5,
+        "values": { "client": 5, "split": 3, "contractor": 1, "unsure": 2 }
+      },
+      "weather_sensitive": {
+        "max": 3,
+        "values": { "no": 3, "yes": 0 }
+      },
+      "site_restrictions": {
+        "max": 3,
+        "values": { "no": 3, "unsure": 1, "yes": 0 }
+      }
+    },
+    "retention_max": 5,
+    "retention_thresholds": { "zero": 0, "low": 3, "standard": 5, "high": 8 },
+    "margin_max": 15,
+    "margin_thresholds": { "excellent": 25, "good": 20, "ok": 15, "low": 10, "poor": 5 }
   },
-  "execution": {
+  "fit": {
+    "thresholds": {
+      "strong": 75,
+      "good": 55,
+      "caution": 35
+    },
     "cashflow_weeks_buffer": 4,
     "survival_months_min": 3,
-    "jobsize_ratio_max": 2.5,
-    "weights": {
-      "profit_pass": 5,
-      "profit_fail": -5,
-      "cashflow_pass": 10,
-      "cashflow_fail": -10,
-      "survival_pass": 5,
-      "survival_fail": -10,
-      "jobsize_pass": 5,
-      "jobsize_fail": -5
+    "job_size": {
+      "same_or_smaller": 20,
+      "slightly_bigger": 15,
+      "bigger": 8,
+      "much_bigger": 0
+    },
+    "cashflow": {
+      "pass": 25,
+      "partial": 12,
+      "fail": 0,
+      "partial_weeks_min": 2
+    },
+    "survival": {
+      "excellent_months": 6,
+      "good_months": 3,
+      "partial_months": 1,
+      "points": { "excellent": 20, "good": 15, "partial": 8, "fail": 0 }
+    },
+    "margin_vs_target": {
+      "exceeds_by": 5,
+      "points": { "exceeds": 15, "meets": 12, "close": 8, "below": 0 },
+      "close_threshold": 5
+    },
+    "worst_case": {
+      "points": { "safe": 10, "tight": 5, "danger": 0 }
     }
-  },
-  "overall": {
-    "excellent_commercial_min": 10,
-    "excellent_execution_min": 15
   }
 }

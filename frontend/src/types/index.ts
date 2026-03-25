@@ -6,6 +6,17 @@ export interface User {
   registration_number?: string | null;
   address?: string | null;
   created_at: string;
+  // Company profile
+  primary_trade?: string | null;
+  phone?: string | null;
+  avg_contract_size?: number | null;
+  target_margin?: number | null;
+  monthly_fixed_costs?: number | null;
+  labour_model?: string | null;
+  cash_reserves?: number | null;
+  years_trading?: number | null;
+  growth_goal?: string | null;
+  main_constraint?: string | null;
 }
 
 export interface AuthResponse {
@@ -21,6 +32,16 @@ export interface RegisterPayload {
   company_name: string;
   registration_number?: string;
   address?: string;
+  primary_trade?: string;
+  phone?: string;
+  avg_contract_size?: number;
+  target_margin?: number;
+  monthly_fixed_costs?: number;
+  labour_model?: string;
+  cash_reserves?: number;
+  years_trading?: number;
+  growth_goal?: string;
+  main_constraint?: string;
 }
 
 export interface LoginPayload {
@@ -30,39 +51,38 @@ export interface LoginPayload {
 
 // ── Questions ────────────────────────────────────────────────────────────────
 
-export interface QuestionOption {
+export interface SelectOption {
   label: string;
-  value: number;
+  value: string;
 }
 
-export interface Question {
+export interface FormField {
   id: string;
   label: string;
-  help?: string;
-  type?: string;
-  options?: QuestionOption[];
+  type: "text" | "number" | "select" | "date" | "textarea";
+  placeholder?: string;
   prefix?: string;
   suffix?: string;
-  default?: number;
-  group?: string;
-  groupLabel?: string;
+  help?: string;
+  options?: SelectOption[];
 }
 
-export interface QuestionSection {
+export interface FormSection {
   id: string;
   title: string;
   description?: string;
-  type: "scored_radio" | "numeric";
-  questions: Question[];
+  fields: FormField[];
 }
 
 export interface QuestionsConfig {
-  sections: QuestionSection[];
+  sections: FormSection[];
 }
 
 // ── Assessments ──────────────────────────────────────────────────────────────
 
 export type AssessmentStatus = "excellent" | "good" | "caution" | "danger";
+export type JobQualityLabel = "excellent" | "good" | "marginal" | "poor";
+export type FitLabel = "strong" | "good" | "caution" | "poor";
 
 export interface AssessmentListItem {
   id: string;
@@ -74,44 +94,49 @@ export interface AssessmentListItem {
   execution_score?: number | null;
 }
 
-export interface CommercialBreakdownItem {
-  id: string;
-  value: number;
+export interface BreakdownItem {
+  label: string;
+  value: string | number;
+  points: number;
+  max: number;
 }
 
-export interface CommercialResult {
-  score: number;
-  breakdown: CommercialBreakdownItem[];
+export interface FitCheck {
+  label: string;
+  passed: boolean;
+  points: number;
+  max: number;
+  detail: string;
+  [key: string]: unknown;
 }
 
-export interface ExecutionResult {
+export interface JobQualityResult {
   score: number;
+  raw_points: number;
+  max_points: number;
+  label: JobQualityLabel;
+  margin_percent: number;
   contract_value: number;
   total_cost: number;
   expected_profit: number;
-  margin_percent: number;
-  meets_target: boolean;
-  target_margin: number;
-  weekly_burn: number;
-  cash_required: number;
-  cash_reserves: number;
-  can_afford: boolean;
-  months_buffer: number;
-  can_survive: boolean;
-  job_size_ratio: number;
-  is_too_big: boolean;
-  worst_case_total_cost: number;
-  worst_case_duration_weeks: number;
-  worst_case_margin_percent: number;
+  breakdown: Record<string, BreakdownItem>;
+}
+
+export interface FitResult {
+  score: number;
+  raw_points: number;
+  max_points: number;
+  label: FitLabel;
+  checks: Record<string, FitCheck>;
 }
 
 export interface AssessmentResults {
+  status: AssessmentStatus;
+  verdict: string;
+  job_quality: JobQualityResult;
+  fit: FitResult;
   commercial_score: number;
   execution_score: number;
-  status: AssessmentStatus;
-  recommendation: string;
-  commercial: CommercialResult;
-  execution: ExecutionResult;
 }
 
 export interface Assessment {
@@ -129,8 +154,5 @@ export interface Assessment {
 
 export interface CreateAssessmentPayload {
   title: string;
-  answers: {
-    commercial: Record<string, number>;
-    execution: Record<string, number>;
-  };
+  answers: Record<string, unknown>;
 }

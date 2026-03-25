@@ -12,19 +12,32 @@ from app.services.scoring_service import compute_scores
 router = APIRouter()
 
 
+def _user_profile(user: User) -> dict:
+    return {
+        "avg_contract_size": float(user.avg_contract_size) if user.avg_contract_size else 0,
+        "target_margin": float(user.target_margin) if user.target_margin else 15,
+        "monthly_fixed_costs": float(user.monthly_fixed_costs) if user.monthly_fixed_costs else 0,
+        "cash_reserves": float(user.cash_reserves) if user.cash_reserves else 0,
+        "labour_model": user.labour_model,
+        "growth_goal": user.growth_goal,
+        "main_constraint": user.main_constraint,
+        "years_trading": float(user.years_trading) if user.years_trading else 0,
+    }
+
+
 @router.post("", response_model=AssessmentOut, status_code=status.HTTP_201_CREATED)
 async def create_assessment(
     body: AssessmentCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    results = compute_scores(body.answers)
+    results = compute_scores(body.answers, _user_profile(current_user))
 
     assessment = Assessment(
         user_id=current_user.id,
         title=body.title,
         status=results["status"],
-        contract_value=results["execution"].get("contract_value"),
+        contract_value=results["job_quality"].get("contract_value"),
         commercial_score=results["commercial_score"],
         execution_score=results["execution_score"],
         answers=body.answers,
