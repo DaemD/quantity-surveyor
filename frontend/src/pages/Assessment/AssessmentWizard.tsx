@@ -41,6 +41,11 @@ function StepIndicator({ current }: { current: Step }) {
   );
 }
 
+// Blocks decimal/scientific-notation keys for integer-only inputs
+function blockDecimalKeys(e: React.KeyboardEvent<HTMLInputElement>) {
+  if ([".", ",", "e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+}
+
 function FieldInput({ field, value, onChange }: {
   field: FormField;
   value: string | number;
@@ -85,6 +90,7 @@ function FieldInput({ field, value, onChange }: {
   }
 
   if (field.type === "number") {
+    const isInt = field.integer === true;
     return (
       <div className="space-y-1.5">
         <Label htmlFor={field.id}>
@@ -99,9 +105,18 @@ function FieldInput({ field, value, onChange }: {
             id={field.id}
             type="number"
             min={0}
-            step="any"
+            step={isInt ? 1 : "any"}
             value={value === 0 ? "" : String(value)}
-            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+            onChange={(e) => {
+              const raw = e.target.value;
+              if (raw === "") { onChange(0); return; }
+              onChange(isInt ? (parseInt(raw, 10) || 0) : (parseFloat(raw) || 0));
+            }}
+            onKeyDown={isInt ? blockDecimalKeys : undefined}
+            onPaste={isInt ? (e) => {
+              const text = e.clipboardData.getData("text");
+              if (/[.,eE]/.test(text)) e.preventDefault();
+            } : undefined}
             className={cn(field.prefix ? "rounded-l-none" : "", field.suffix ? "rounded-r-none" : "")}
           />
           {field.suffix && (

@@ -11,12 +11,12 @@
           { "label": "Subcontractor", "value": "subcontractor" }
         ]},
         { "id": "estimated_start_date", "label": "Estimated Start Date", "type": "date", "required": false },
-        { "id": "duration_weeks", "label": "Estimated Duration", "type": "number", "suffix": "weeks", "required": true },
-        { "id": "contract_value", "label": "Contract Value", "type": "number", "prefix": "£", "required": true },
-        { "id": "total_cost", "label": "Total Cost (Labour + Materials)", "type": "number", "prefix": "£", "required": true },
-        { "id": "contingency", "label": "Contingency Included", "type": "number", "prefix": "£", "help": "Enter 0 if none", "required": true },
-        { "id": "labour_cost", "label": "Estimated Labour Cost", "type": "number", "prefix": "£", "required": true },
-        { "id": "materials_cost", "label": "Estimated Materials Cost", "type": "number", "prefix": "£", "required": true },
+        { "id": "duration_weeks", "label": "Estimated Duration", "type": "number", "suffix": "weeks", "integer": true, "required": true },
+        { "id": "contract_value", "label": "Contract Value", "type": "number", "prefix": "£", "integer": true, "required": true },
+        { "id": "total_cost", "label": "Total Cost (Labour + Materials)", "type": "number", "prefix": "£", "integer": true, "required": true },
+        { "id": "contingency", "label": "Contingency Included", "type": "number", "prefix": "£", "integer": true, "help": "Enter 0 if none", "required": true },
+        { "id": "labour_cost", "label": "Estimated Labour Cost", "type": "number", "prefix": "£", "integer": true, "required": true },
+        { "id": "materials_cost", "label": "Estimated Materials Cost", "type": "number", "prefix": "£", "integer": true, "required": true },
         { "id": "job_size_comparison", "label": "Compared to your usual jobs, this job is:", "type": "select", "required": true, "options": [
           { "label": "Smaller than usual", "value": "smaller_than_usual" },
           { "label": "About the same", "value": "about_the_same" },
@@ -101,8 +101,8 @@
           { "label": "Unsure", "value": "unsure" }
         ]},
         { "id": "specialist_trades", "label": "Specialist Trades Required?", "type": "text", "placeholder": "e.g. Steelwork, glazing — leave blank if none", "required": false },
-        { "id": "worst_case_overrun_cost", "label": "Worst-Case Overrun Cost", "type": "number", "prefix": "£", "help": "Enter 0 if none expected", "required": true },
-        { "id": "worst_case_overrun_weeks", "label": "Worst-Case Extra Time", "type": "number", "suffix": "weeks", "help": "Enter 0 if none expected", "required": true },
+        { "id": "worst_case_overrun_cost", "label": "Worst-Case Overrun Cost", "type": "number", "prefix": "£", "integer": true, "help": "Enter 0 if none expected", "required": true },
+        { "id": "worst_case_overrun_weeks", "label": "Worst-Case Extra Time", "type": "number", "suffix": "weeks", "integer": true, "help": "Enter 0 if none expected", "required": true },
         { "id": "commercial_red_flags", "label": "Any Known Commercial Red Flags", "type": "textarea", "placeholder": "e.g. client has history of late payment... leave blank if none", "required": false }
       ]
     }

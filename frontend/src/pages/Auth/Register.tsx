@@ -90,6 +90,14 @@ export default function Register() {
   const set = (key: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement>) => setForm((p) => ({ ...p, [key]: e.target.value }));
 
+  // Blocks decimal/scientific-notation keys for integer-only inputs
+  const blockDecimalKeys = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if ([".", ",", "e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  };
+  const blockDecimalPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    if (/[.,eE]/.test(e.clipboardData.getData("text"))) e.preventDefault();
+  };
+
   const setSelect = (key: keyof typeof form) => (v: string) => setForm((p) => ({ ...p, [key]: v }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -191,7 +199,7 @@ export default function Register() {
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="years_trading">Years Trading <span className="text-red-400">*</span></Label>
-                    <Input id="years_trading" type="number" min="0" step="0.5" value={form.years_trading} onChange={set("years_trading")} placeholder="e.g. 5" required />
+                    <Input id="years_trading" type="number" min="0" step="1" value={form.years_trading} onChange={set("years_trading")} onKeyDown={blockDecimalKeys} onPaste={blockDecimalPaste} placeholder="e.g. 5" required />
                   </div>
                   <div className="space-y-1.5 sm:col-span-2">
                     <Label htmlFor="registration_number">Company Registration Number</Label>
@@ -214,7 +222,7 @@ export default function Register() {
                     <Label htmlFor="avg_contract_size">Average Contract Size <span className="text-red-400">*</span></Label>
                     <div className="flex">
                       <span className="flex items-center rounded-l-lg border border-r-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">£</span>
-                      <Input id="avg_contract_size" type="number" min="0" value={form.avg_contract_size} onChange={set("avg_contract_size")} placeholder="50000" className="rounded-l-none" required />
+                      <Input id="avg_contract_size" type="number" min="0" step="1" value={form.avg_contract_size} onChange={set("avg_contract_size")} onKeyDown={blockDecimalKeys} onPaste={blockDecimalPaste} placeholder="50000" className="rounded-l-none" required />
                     </div>
                   </div>
                   <div className="space-y-1.5">
@@ -228,14 +236,14 @@ export default function Register() {
                     <Label htmlFor="monthly_fixed_costs">Monthly Fixed Costs (Overheads) <span className="text-red-400">*</span></Label>
                     <div className="flex">
                       <span className="flex items-center rounded-l-lg border border-r-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">£</span>
-                      <Input id="monthly_fixed_costs" type="number" min="0" value={form.monthly_fixed_costs} onChange={set("monthly_fixed_costs")} placeholder="10000" className="rounded-l-none" required />
+                      <Input id="monthly_fixed_costs" type="number" min="0" step="1" value={form.monthly_fixed_costs} onChange={set("monthly_fixed_costs")} onKeyDown={blockDecimalKeys} onPaste={blockDecimalPaste} placeholder="10000" className="rounded-l-none" required />
                     </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="cash_reserves">Available Cash Reserves <span className="text-red-400">*</span></Label>
                     <div className="flex">
                       <span className="flex items-center rounded-l-lg border border-r-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">£</span>
-                      <Input id="cash_reserves" type="number" min="0" value={form.cash_reserves} onChange={set("cash_reserves")} placeholder="30000" className="rounded-l-none" required />
+                      <Input id="cash_reserves" type="number" min="0" step="1" value={form.cash_reserves} onChange={set("cash_reserves")} onKeyDown={blockDecimalKeys} onPaste={blockDecimalPaste} placeholder="30000" className="rounded-l-none" required />
                     </div>
                   </div>
                   <SelectField
