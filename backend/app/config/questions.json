@@ -5,19 +5,19 @@
       "title": "Job Overview",
       "description": "Basic details about this contract.",
       "fields": [
-        { "id": "job_location", "label": "Job Location (City / Area)", "type": "text", "placeholder": "e.g. Manchester" },
-        { "id": "role", "label": "Your Role on This Job", "type": "select", "options": [
+        { "id": "job_location", "label": "Job Location (City / Area)", "type": "text", "placeholder": "e.g. Manchester", "required": true },
+        { "id": "role", "label": "Your Role on This Job", "type": "select", "required": true, "options": [
           { "label": "Main Contractor", "value": "main_contractor" },
           { "label": "Subcontractor", "value": "subcontractor" }
         ]},
-        { "id": "estimated_start_date", "label": "Estimated Start Date", "type": "date" },
-        { "id": "duration_weeks", "label": "Estimated Duration", "type": "number", "suffix": "weeks" },
-        { "id": "contract_value", "label": "Contract Value", "type": "number", "prefix": "£" },
-        { "id": "total_cost", "label": "Total Cost (Labour + Materials)", "type": "number", "prefix": "£" },
-        { "id": "contingency", "label": "Contingency Included", "type": "number", "prefix": "£", "help": "Leave 0 if none" },
-        { "id": "labour_cost", "label": "Estimated Labour Cost", "type": "number", "prefix": "£" },
-        { "id": "materials_cost", "label": "Estimated Materials Cost", "type": "number", "prefix": "£" },
-        { "id": "job_size_comparison", "label": "Compared to your usual jobs, this job is:", "type": "select", "options": [
+        { "id": "estimated_start_date", "label": "Estimated Start Date", "type": "date", "required": false },
+        { "id": "duration_weeks", "label": "Estimated Duration", "type": "number", "suffix": "weeks", "required": true },
+        { "id": "contract_value", "label": "Contract Value", "type": "number", "prefix": "£", "required": true },
+        { "id": "total_cost", "label": "Total Cost (Labour + Materials)", "type": "number", "prefix": "£", "required": true },
+        { "id": "contingency", "label": "Contingency Included", "type": "number", "prefix": "£", "help": "Enter 0 if none", "required": true },
+        { "id": "labour_cost", "label": "Estimated Labour Cost", "type": "number", "prefix": "£", "required": true },
+        { "id": "materials_cost", "label": "Estimated Materials Cost", "type": "number", "prefix": "£", "required": true },
+        { "id": "job_size_comparison", "label": "Compared to your usual jobs, this job is:", "type": "select", "required": true, "options": [
           { "label": "Smaller than usual", "value": "smaller_than_usual" },
           { "label": "About the same", "value": "about_the_same" },
           { "label": "Bigger than usual", "value": "bigger_than_usual" },
@@ -30,37 +30,37 @@
       "title": "Commercial Terms",
       "description": "How is the contract structured commercially?",
       "fields": [
-        { "id": "price_firmness", "label": "How Firm Is the Price at This Stage?", "type": "select", "options": [
+        { "id": "price_firmness", "label": "How Firm Is the Price at This Stage?", "type": "select", "required": true, "options": [
           { "label": "Very firm — agreed and locked", "value": "very_firm" },
           { "label": "Reasonably firm — minor unknowns", "value": "reasonably_firm" },
           { "label": "Early estimate — subject to change", "value": "early_estimate" },
           { "label": "Very rough — significant unknowns", "value": "very_rough" }
         ]},
-        { "id": "payment_terms", "label": "How Will You Get Paid?", "type": "select", "options": [
+        { "id": "payment_terms", "label": "How Will You Get Paid?", "type": "select", "required": true, "options": [
           { "label": "Weekly / Monthly valuations", "value": "weekly_monthly" },
           { "label": "Stage payments / Milestones", "value": "stage_payments" },
           { "label": "End of job / On completion", "value": "end_of_job" },
           { "label": "Dayworks / Cost-plus", "value": "dayworks_cost_plus" }
         ]},
-        { "id": "retention", "label": "Retention (%)", "type": "number", "suffix": "%", "help": "Enter 0 if no retention" },
-        { "id": "upfront_payment", "label": "Will You Get an Upfront Payment?", "type": "select", "options": [
+        { "id": "retention", "label": "Retention (%)", "type": "number", "suffix": "%", "help": "Enter 0 if no retention", "required": true },
+        { "id": "upfront_payment", "label": "Will You Get an Upfront Payment?", "type": "select", "required": true, "options": [
           { "label": "Yes", "value": "yes" },
           { "label": "No", "value": "no" },
           { "label": "Unsure", "value": "unsure" }
         ]},
-        { "id": "deposit_percent", "label": "Deposit % You Will Receive", "type": "number", "suffix": "%", "help": "Enter 0 if no deposit" },
-        { "id": "variations", "label": "How Are Changes / Extras Handled?", "type": "select", "options": [
+        { "id": "deposit_percent", "label": "Deposit % You Will Receive", "type": "number", "suffix": "%", "help": "Enter 0 if no deposit", "required": true },
+        { "id": "variations", "label": "How Are Changes / Extras Handled?", "type": "select", "required": true, "options": [
           { "label": "Agreed and priced in writing before work", "value": "written_before" },
           { "label": "Agreed in writing, priced after work", "value": "written_after" },
           { "label": "Agreed verbally first, priced later", "value": "verbal" },
           { "label": "No clear process agreed", "value": "no_process" }
         ]},
-        { "id": "delay_damages", "label": "Delay / Damage Charges (LADs) Mentioned?", "type": "select", "options": [
+        { "id": "delay_damages", "label": "Delay / Damage Charges (LADs) Mentioned?", "type": "select", "required": true, "options": [
           { "label": "Yes", "value": "yes" },
           { "label": "No", "value": "no" },
           { "label": "Unsure", "value": "unsure" }
         ]},
-        { "id": "programme_risk", "label": "Who Carries Programme Risk?", "type": "select", "options": [
+        { "id": "programme_risk", "label": "Who Carries Programme Risk?", "type": "select", "required": true, "options": [
           { "label": "Client", "value": "client" },
           { "label": "Main Contractor", "value": "contractor" },
           { "label": "Shared", "value": "shared" },
@@ -73,37 +73,37 @@
       "title": "Risk Factors",
       "description": "Design, materials, and site conditions.",
       "fields": [
-        { "id": "design_status", "label": "Design / Information Status", "type": "select", "options": [
+        { "id": "design_status", "label": "Design / Information Status", "type": "select", "required": true, "options": [
           { "label": "Fully defined — complete drawings and specs", "value": "fully_defined" },
           { "label": "Mostly defined — minor gaps", "value": "mostly_defined" },
           { "label": "Gaps / Assumptions required", "value": "gaps" },
           { "label": "Largely undefined — significant unknowns", "value": "largely_undefined" }
         ]},
-        { "id": "provisional_sums", "label": "Provisional Sums / Unknown Items?", "type": "select", "options": [
+        { "id": "provisional_sums", "label": "Provisional Sums / Unknown Items?", "type": "select", "required": true, "options": [
           { "label": "Yes — significant (>10% of contract)", "value": "significant" },
           { "label": "Yes — minor (<10%)", "value": "minor" },
           { "label": "None — fully measured", "value": "none" },
           { "label": "Unsure", "value": "unsure" }
         ]},
-        { "id": "material_supply", "label": "Who Supplies Materials?", "type": "select", "options": [
+        { "id": "material_supply", "label": "Who Supplies Materials?", "type": "select", "required": true, "options": [
           { "label": "Client free-issue / supplied", "value": "client" },
           { "label": "Split between contractor and client", "value": "split" },
           { "label": "Contractor supplies all", "value": "contractor" },
           { "label": "Unsure", "value": "unsure" }
         ]},
-        { "id": "weather_sensitive", "label": "Weather-Sensitive Works Involved?", "type": "select", "options": [
+        { "id": "weather_sensitive", "label": "Weather-Sensitive Works Involved?", "type": "select", "required": true, "options": [
           { "label": "No", "value": "no" },
           { "label": "Yes", "value": "yes" }
         ]},
-        { "id": "site_restrictions", "label": "Site Access / Working Restrictions?", "type": "select", "options": [
+        { "id": "site_restrictions", "label": "Site Access / Working Restrictions?", "type": "select", "required": true, "options": [
           { "label": "No restrictions", "value": "no" },
           { "label": "Yes — restricted hours / access", "value": "yes" },
           { "label": "Unsure", "value": "unsure" }
         ]},
-        { "id": "specialist_trades", "label": "Specialist Trades Required?", "type": "text", "placeholder": "e.g. Steelwork, glazing — leave blank if none" },
-        { "id": "worst_case_overrun_cost", "label": "Worst-Case Overrun Cost", "type": "number", "prefix": "£", "help": "Your estimate of maximum additional cost if things go wrong" },
-        { "id": "worst_case_overrun_weeks", "label": "Worst-Case Extra Time", "type": "number", "suffix": "weeks" },
-        { "id": "commercial_red_flags", "label": "Any Known Commercial Red Flags", "type": "textarea", "placeholder": "e.g. client has history of late payment, unusual contract clauses..." }
+        { "id": "specialist_trades", "label": "Specialist Trades Required?", "type": "text", "placeholder": "e.g. Steelwork, glazing — leave blank if none", "required": false },
+        { "id": "worst_case_overrun_cost", "label": "Worst-Case Overrun Cost", "type": "number", "prefix": "£", "help": "Enter 0 if none expected", "required": true },
+        { "id": "worst_case_overrun_weeks", "label": "Worst-Case Extra Time", "type": "number", "suffix": "weeks", "help": "Enter 0 if none expected", "required": true },
+        { "id": "commercial_red_flags", "label": "Any Known Commercial Red Flags", "type": "textarea", "placeholder": "e.g. client has history of late payment... leave blank if none", "required": false }
       ]
     }
   ]

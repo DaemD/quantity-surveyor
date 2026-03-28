@@ -126,6 +126,18 @@ function FieldInput({ field, value, onChange }: {
   );
 }
 
+function MissingWarning({ missing }: { missing: string[] }) {
+  if (missing.length === 0) return null;
+  return (
+    <div className="mt-4 rounded-lg border border-amber-700/50 bg-amber-900/20 px-4 py-3">
+      <p className="text-amber-400 text-sm font-medium mb-1">Please fill in all required fields:</p>
+      <ul className="list-disc list-inside space-y-0.5">
+        {missing.map((f) => <li key={f} className="text-amber-300 text-xs">{f}</li>)}
+      </ul>
+    </div>
+  );
+}
+
 function SectionForm({ section, answers, onChange }: {
   section: FormSection;
   answers: Record<string, string | number>;
@@ -170,6 +182,23 @@ export default function AssessmentWizard() {
     setAnswers((prev) => ({ ...prev, [id]: v }));
 
   const getSection = (id: string) => questions?.sections.find((s) => s.id === id);
+
+  const getMissingFields = (sectionId: string): string[] => {
+    const section = getSection(sectionId);
+    if (!section) return [];
+    return section.fields
+      .filter((f) => f.required !== false)
+      .filter((f) => {
+        const val = answers[f.id];
+        if (f.type === "number") return val === undefined || val === "" || val === null;
+        return !val || String(val).trim() === "";
+      })
+      .map((f) => f.label);
+  };
+
+  const overviewMissing = getMissingFields("overview");
+  const commercialMissing = getMissingFields("commercial_terms");
+  const riskMissing = getMissingFields("risk_factors");
 
   const handleSubmit = async () => {
     const result = await createMutation.mutateAsync({
@@ -257,11 +286,12 @@ export default function AssessmentWizard() {
               answers={answers}
               onChange={setAnswer}
             />
-            <div className="flex justify-between mt-8">
+            <MissingWarning missing={overviewMissing} />
+            <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep("intro")} className="gap-2">
                 <ArrowLeft className="h-4 w-4" />Back
               </Button>
-              <Button onClick={() => setStep("commercial")} className="gap-2">
+              <Button onClick={() => setStep("commercial")} className="gap-2" disabled={overviewMissing.length > 0}>
                 Next: Commercial Terms <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
@@ -276,11 +306,12 @@ export default function AssessmentWizard() {
               answers={answers}
               onChange={setAnswer}
             />
-            <div className="flex justify-between mt-8">
+            <MissingWarning missing={commercialMissing} />
+            <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep("overview")} className="gap-2">
                 <ArrowLeft className="h-4 w-4" />Back
               </Button>
-              <Button onClick={() => setStep("risk")} className="gap-2">
+              <Button onClick={() => setStep("risk")} className="gap-2" disabled={commercialMissing.length > 0}>
                 Next: Risk Factors <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
@@ -295,7 +326,8 @@ export default function AssessmentWizard() {
               answers={answers}
               onChange={setAnswer}
             />
-            <div className="flex justify-between mt-8">
+            <MissingWarning missing={riskMissing} />
+            <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep("commercial")} className="gap-2">
                 <ArrowLeft className="h-4 w-4" />Back
               </Button>
@@ -303,7 +335,7 @@ export default function AssessmentWizard() {
                 size="lg"
                 className="gap-2"
                 onClick={async () => { setStep("results"); await handleSubmit(); }}
-                disabled={createMutation.isPending}
+                disabled={createMutation.isPending || riskMissing.length > 0}
               >
                 {createMutation.isPending
                   ? <><Loader2 className="h-4 w-4 animate-spin" />Analysing…</>

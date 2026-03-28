@@ -186,12 +186,12 @@ export default function Register() {
                     <Input id="primary_trade" value={form.primary_trade} onChange={set("primary_trade")} placeholder="e.g. Groundworks, Electrical, Fit-out" required />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" value={form.phone} onChange={set("phone")} placeholder="07700 900000" />
+                    <Label htmlFor="phone">Phone <span className="text-red-400">*</span></Label>
+                    <Input id="phone" value={form.phone} onChange={set("phone")} placeholder="07700 900000" required />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="years_trading">Years Trading</Label>
-                    <Input id="years_trading" type="number" min="0" step="0.5" value={form.years_trading} onChange={set("years_trading")} placeholder="e.g. 5" />
+                    <Label htmlFor="years_trading">Years Trading <span className="text-red-400">*</span></Label>
+                    <Input id="years_trading" type="number" min="0" step="0.5" value={form.years_trading} onChange={set("years_trading")} placeholder="e.g. 5" required />
                   </div>
                   <div className="space-y-1.5 sm:col-span-2">
                     <Label htmlFor="registration_number">Company Registration Number</Label>
@@ -211,10 +211,10 @@ export default function Register() {
                 <SectionTitle>Business Profile — used in every deal assessment</SectionTitle>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="avg_contract_size">Average Contract Size</Label>
+                    <Label htmlFor="avg_contract_size">Average Contract Size <span className="text-red-400">*</span></Label>
                     <div className="flex">
                       <span className="flex items-center rounded-l-lg border border-r-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">£</span>
-                      <Input id="avg_contract_size" type="number" min="0" value={form.avg_contract_size} onChange={set("avg_contract_size")} placeholder="50000" className="rounded-l-none" />
+                      <Input id="avg_contract_size" type="number" min="0" value={form.avg_contract_size} onChange={set("avg_contract_size")} placeholder="50000" className="rounded-l-none" required />
                     </div>
                   </div>
                   <div className="space-y-1.5">
@@ -225,34 +225,34 @@ export default function Register() {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="monthly_fixed_costs">Monthly Fixed Costs (Overheads)</Label>
+                    <Label htmlFor="monthly_fixed_costs">Monthly Fixed Costs (Overheads) <span className="text-red-400">*</span></Label>
                     <div className="flex">
                       <span className="flex items-center rounded-l-lg border border-r-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">£</span>
-                      <Input id="monthly_fixed_costs" type="number" min="0" value={form.monthly_fixed_costs} onChange={set("monthly_fixed_costs")} placeholder="10000" className="rounded-l-none" />
+                      <Input id="monthly_fixed_costs" type="number" min="0" value={form.monthly_fixed_costs} onChange={set("monthly_fixed_costs")} placeholder="10000" className="rounded-l-none" required />
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="cash_reserves">Available Cash Reserves</Label>
+                    <Label htmlFor="cash_reserves">Available Cash Reserves <span className="text-red-400">*</span></Label>
                     <div className="flex">
                       <span className="flex items-center rounded-l-lg border border-r-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">£</span>
-                      <Input id="cash_reserves" type="number" min="0" value={form.cash_reserves} onChange={set("cash_reserves")} placeholder="30000" className="rounded-l-none" />
+                      <Input id="cash_reserves" type="number" min="0" value={form.cash_reserves} onChange={set("cash_reserves")} placeholder="30000" className="rounded-l-none" required />
                     </div>
                   </div>
                   <SelectField
                     id="labour_model" label="Labour Model"
                     value={form.labour_model} onChange={setSelect("labour_model")}
-                    options={LABOUR_MODELS}
+                    options={LABOUR_MODELS} required
                   />
                   <SelectField
                     id="growth_goal" label="Company Growth Goal (Next 12 Months)"
                     value={form.growth_goal} onChange={setSelect("growth_goal")}
-                    options={GROWTH_GOALS}
+                    options={GROWTH_GOALS} required
                   />
                   <div className="sm:col-span-2">
                     <SelectField
                       id="main_constraint" label="Main Business Constraint Right Now"
                       value={form.main_constraint} onChange={setSelect("main_constraint")}
-                      options={CONSTRAINTS}
+                      options={CONSTRAINTS} required
                     />
                   </div>
                 </div>
