@@ -36,8 +36,8 @@ export default function JobTable({ assessments }: JobTableProps) {
           <tr className="border-b border-slate-700">
             <th className="text-left py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Job Title</th>
             <th className="text-right py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Contract Value</th>
-            <th className="text-right py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Commercial</th>
-            <th className="text-right py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Execution</th>
+            <th className="text-right py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Job Quality</th>
+            <th className="text-right py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Fit Score</th>
             <th className="text-center py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
             <th className="text-right py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Date</th>
             <th className="py-3 px-4"></th>
@@ -51,13 +51,13 @@ export default function JobTable({ assessments }: JobTableProps) {
                 <td className="py-3.5 px-4 font-medium text-white">{a.title}</td>
                 <td className="py-3.5 px-4 text-right text-slate-300">{formatCurrency(a.contract_value)}</td>
                 <td className="py-3.5 px-4 text-right">
-                  <span className={a.commercial_score != null && a.commercial_score >= 0 ? "text-emerald-400" : "text-red-400"}>
-                    {a.commercial_score != null ? `${a.commercial_score > 0 ? "+" : ""}${a.commercial_score}/20` : "—"}
+                  <span className={a.commercial_score != null && a.commercial_score >= 55 ? "text-emerald-400" : "text-amber-400"}>
+                    {a.commercial_score != null ? `${a.commercial_score}/100` : "—"}
                   </span>
                 </td>
                 <td className="py-3.5 px-4 text-right">
-                  <span className={a.execution_score != null && a.execution_score >= 0 ? "text-emerald-400" : "text-red-400"}>
-                    {a.execution_score != null ? `${a.execution_score > 0 ? "+" : ""}${a.execution_score}` : "—"}
+                  <span className={a.execution_score != null && a.execution_score >= 55 ? "text-emerald-400" : "text-amber-400"}>
+                    {a.execution_score != null ? `${a.execution_score}/100` : "—"}
                   </span>
                 </td>
                 <td className="py-3.5 px-4 text-center">

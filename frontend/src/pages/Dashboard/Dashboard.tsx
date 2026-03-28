@@ -67,15 +67,17 @@ export default function Dashboard() {
             iconBg="bg-blue-900/30"
           />
           <StatCard
-            title="Avg Commercial Score"
-            value={total > 0 ? `${avgCommercial > 0 ? "+" : ""}${avgCommercial}/20` : "—"}
+            title="Avg Job Quality"
+            value={total > 0 ? `${avgCommercial}/100` : "—"}
+            sub="Contract terms score"
             icon={TrendingUp}
             iconColor="text-emerald-400"
             iconBg="bg-emerald-900/30"
           />
           <StatCard
-            title="Avg Execution Score"
-            value={total > 0 ? `${avgExecution > 0 ? "+" : ""}${avgExecution}` : "—"}
+            title="Avg Fit Score"
+            value={total > 0 ? `${avgExecution}/100` : "—"}
+            sub="How well jobs suit your business"
             icon={Activity}
             iconColor="text-violet-400"
             iconBg="bg-violet-900/30"
