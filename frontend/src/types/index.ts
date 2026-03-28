@@ -66,6 +66,7 @@ export interface FormField {
   help?: string;
   required?: boolean;
   integer?: boolean;
+  allow_zero?: boolean;
   options?: SelectOption[];
 }
 

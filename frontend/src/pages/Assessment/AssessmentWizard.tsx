@@ -91,6 +91,7 @@ function FieldInput({ field, value, onChange }: {
 
   if (field.type === "number") {
     const isInt = field.integer === true;
+    const minVal = field.allow_zero ? 0 : 1;
     return (
       <div className="space-y-1.5">
         <Label htmlFor={field.id}>
@@ -104,9 +105,10 @@ function FieldInput({ field, value, onChange }: {
           <Input
             id={field.id}
             type="number"
-            min={0}
+            min={minVal}
             step={isInt ? 1 : "any"}
-            value={value === 0 ? "" : String(value)}
+            value={value === 0 && !field.allow_zero ? "" : value === 0 ? "0" : String(value)}
+            placeholder={field.allow_zero ? "0" : undefined}
             onChange={(e) => {
               const raw = e.target.value;
               if (raw === "") { onChange(0); return; }
@@ -205,7 +207,12 @@ export default function AssessmentWizard() {
       .filter((f) => f.required !== false)
       .filter((f) => {
         const val = answers[f.id];
-        if (f.type === "number") return val === undefined || val === "" || val === null;
+        if (f.type === "number") {
+          if (val === undefined || val === "" || val === null) return true;
+          // 0 is only acceptable when the field explicitly allows it
+          if (!f.allow_zero && Number(val) === 0) return true;
+          return false;
+        }
         return !val || String(val).trim() === "";
       })
       .map((f) => f.label);
