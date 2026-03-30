@@ -65,16 +65,24 @@
     "cashflow_weeks_buffer": 4,
     "survival_months_min": 3,
     "job_size": {
-      "same_or_smaller": 20,
-      "slightly_bigger": 15,
-      "bigger": 8,
-      "much_bigger": 0
+      "thresholds": {
+        "same_or_smaller": 1.1,
+        "slightly_bigger": 1.75,
+        "bigger": 3.0
+      },
+      "points": {
+        "same_or_smaller": 20,
+        "slightly_bigger": 15,
+        "bigger": 8,
+        "much_bigger": 0
+      }
     },
     "cashflow": {
-      "pass": 25,
-      "partial": 12,
-      "fail": 0,
-      "partial_weeks_min": 2
+      "weeks_4": 25,
+      "weeks_3": 20,
+      "weeks_2": 12,
+      "weeks_1": 6,
+      "fail": 0
     },
     "survival": {
       "excellent_months": 6,

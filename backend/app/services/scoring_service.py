@@ -152,53 +152,72 @@ def compute_fit(answers: dict[str, Any], profile: dict[str, Any]) -> dict[str, A
 
     effective_cost = total_cost + contingency
 
-    # ── 1. Job Size (20 pts) ─────────────────────────────────────────────
+    # ── 1. Job Size (20 pts) — scored from actual contract/avg ratio ─────
     size_cfg = cfg["job_size"]
-    size_map = {
-        "smaller_than_usual": size_cfg["same_or_smaller"],
-        "about_the_same": size_cfg["same_or_smaller"],
-        "bigger_than_usual": size_cfg["slightly_bigger"],
-        "much_bigger_than_usual": size_cfg["much_bigger"],
-    }
-    size_pts = size_map.get(job_size_comparison, size_cfg["slightly_bigger"])
+    size_pts_map = size_cfg["points"]
+    size_thresh = size_cfg["thresholds"]
     size_ratio = round(contract_value / avg_contract, 2) if avg_contract > 0 else 1.0
+
+    if size_ratio <= size_thresh["same_or_smaller"]:
+        size_pts = size_pts_map["same_or_smaller"]
+        size_label = "same or smaller than your average"
+    elif size_ratio <= size_thresh["slightly_bigger"]:
+        size_pts = size_pts_map["slightly_bigger"]
+        size_label = "slightly bigger than your average"
+    elif size_ratio <= size_thresh["bigger"]:
+        size_pts = size_pts_map["bigger"]
+        size_label = "significantly bigger than your average"
+    else:
+        size_pts = size_pts_map["much_bigger"]
+        size_label = "much bigger than your average — high stretch risk"
+
     total_points += size_pts
     checks["job_size"] = {
         "label": "Job Size Fit",
-        "passed": size_pts >= size_cfg["slightly_bigger"],
+        "passed": size_pts >= size_pts_map["slightly_bigger"],
         "points": size_pts,
-        "max": size_cfg["same_or_smaller"],
-        "detail": f"{size_ratio}x your average contract size",
+        "max": size_pts_map["same_or_smaller"],
+        "detail": f"{size_ratio}x your average — {size_label}",
     }
 
-    # ── 2. Cashflow (25 pts) ─────────────────────────────────────────────
+    # ── 2. Cashflow (25 pts) — graded by weeks of burn covered ──────────
     weekly_burn = effective_cost / duration_weeks
-    cash_needed = weekly_burn * cfg["cashflow_weeks_buffer"]
-    partial_threshold = weekly_burn * cfg["cashflow"]["partial_weeks_min"]
+    weeks_covered = cash_reserves / weekly_burn if weekly_burn > 0 else 99
 
-    if cash_reserves >= cash_needed:
-        cf_pts = cfg["cashflow"]["pass"]
+    cf_cfg = cfg["cashflow"]
+    if weeks_covered >= 4:
+        cf_pts = cf_cfg["weeks_4"]
         cf_passed = True
-        cf_detail = f"Cash reserves ({_fmt_gbp(cash_reserves)}) cover {cfg['cashflow_weeks_buffer']} weeks burn"
-    elif cash_reserves >= partial_threshold:
-        cf_pts = cfg["cashflow"]["partial"]
+        cf_detail = f"Reserves cover {weeks_covered:.1f} weeks burn — healthy buffer"
+    elif weeks_covered >= 3:
+        cf_pts = cf_cfg["weeks_3"]
+        cf_passed = True
+        cf_detail = f"Reserves cover {weeks_covered:.1f} weeks — adequate but tight"
+    elif weeks_covered >= 2:
+        cf_pts = cf_cfg["weeks_2"]
         cf_passed = False
-        cf_detail = f"Tight — reserves cover some but not full {cfg['cashflow_weeks_buffer']}-week buffer"
+        cf_detail = f"Reserves cover {weeks_covered:.1f} weeks — below recommended 4-week buffer"
+    elif weeks_covered >= 1:
+        cf_pts = cf_cfg["weeks_1"]
+        cf_passed = False
+        cf_detail = f"Reserves cover only {weeks_covered:.1f} week — serious cashflow risk"
     else:
-        cf_pts = cfg["cashflow"]["fail"]
+        cf_pts = cf_cfg["fail"]
         cf_passed = False
-        cf_detail = f"Shortfall — need ~{_fmt_gbp(cash_needed)}, have {_fmt_gbp(cash_reserves)}"
+        cf_detail = f"Reserves cover less than 1 week of burn — cashflow danger"
 
+    cash_needed_4wk = weekly_burn * 4
     total_points += cf_pts
     checks["cashflow"] = {
         "label": "Cashflow Affordability",
         "passed": cf_passed,
         "points": cf_pts,
-        "max": cfg["cashflow"]["pass"],
+        "max": cf_cfg["weeks_4"],
         "detail": cf_detail,
-        "cash_needed": round(cash_needed, 2),
+        "cash_needed": round(cash_needed_4wk, 2),
         "cash_reserves": cash_reserves,
         "weekly_burn": round(weekly_burn, 2),
+        "weeks_covered": round(weeks_covered, 1),
     }
 
     # ── 3. Survival Buffer (20 pts) ──────────────────────────────────────
@@ -253,18 +272,23 @@ def compute_fit(answers: dict[str, Any], profile: dict[str, Any]) -> dict[str, A
     # ── 5. Worst Case Survival (10 pts) ──────────────────────────────────
     worst_total_cost = effective_cost + worst_overrun_cost
     worst_margin = ((contract_value - worst_total_cost) / contract_value * 100) if contract_value > 0 else 0
-    worst_burn = worst_total_cost / (duration_weeks + worst_overrun_weeks) if (duration_weeks + worst_overrun_weeks) > 0 else weekly_burn
-    worst_cash_needed = worst_burn * cfg["cashflow_weeks_buffer"]
+    total_worst_weeks = duration_weeks + worst_overrun_weeks
+    worst_burn = worst_total_cost / total_worst_weeks if total_worst_weeks > 0 else weekly_burn
+    worst_weeks_covered = cash_reserves / worst_burn if worst_burn > 0 else 99
 
     wc_cfg = cfg["worst_case"]["points"]
-    if worst_margin >= 0 and cash_reserves >= worst_cash_needed:
+    if worst_margin >= 0 and worst_weeks_covered >= 4:
         wc_pts = wc_cfg["safe"]
         wc_passed = True
-        wc_detail = f"Even in worst case, margin stays at {round(worst_margin, 1)}%"
+        wc_detail = f"Even in worst case, margin stays at {round(worst_margin, 1)}% with cashflow intact"
+    elif worst_margin >= 0 and worst_weeks_covered >= 2:
+        wc_pts = wc_cfg["tight"]
+        wc_passed = False
+        wc_detail = f"Worst-case margin {round(worst_margin, 1)}% — cashflow gets tight under overrun"
     elif worst_margin >= 0:
         wc_pts = wc_cfg["tight"]
         wc_passed = False
-        wc_detail = f"Worst-case margin {round(worst_margin, 1)}% — cashflow tight under overrun"
+        wc_detail = f"Worst-case margin {round(worst_margin, 1)}% — but cashflow under serious pressure"
     else:
         wc_pts = wc_cfg["danger"]
         wc_passed = False
@@ -278,6 +302,7 @@ def compute_fit(answers: dict[str, Any], profile: dict[str, Any]) -> dict[str, A
         "max": wc_cfg["safe"],
         "detail": wc_detail,
         "worst_margin_percent": round(worst_margin, 1),
+        "worst_weeks_covered": round(worst_weeks_covered, 1),
     }
 
     # Normalize: max possible = 20+25+20+15+10 = 90

@@ -91,9 +91,14 @@ function FitCheckRow({ check }: { check: FitCheck }) {
 
   // Build extra context lines per check type
   const extras: string[] = [];
+  if ("weekly_burn" in check) {
+    extras.push(`Weekly burn rate: ${formatCurrency(check.weekly_burn as number)}/week`);
+  }
   if ("cash_needed" in check && "cash_reserves" in check) {
-    extras.push(`Need: ${formatCurrency(check.cash_needed as number)} — Have: ${formatCurrency(check.cash_reserves as number)}`);
-    if ("weekly_burn" in check) extras.push(`Weekly burn rate: ${formatCurrency(check.weekly_burn as number)}/week`);
+    extras.push(`4-week buffer needed: ${formatCurrency(check.cash_needed as number)} — You have: ${formatCurrency(check.cash_reserves as number)}`);
+  }
+  if ("weeks_covered" in check) {
+    extras.push(`Your reserves cover ${(check.weeks_covered as number).toFixed(1)} weeks of burn (recommended: 4 weeks)`);
   }
   if ("months_buffer" in check) {
     extras.push(`${(check.months_buffer as number).toFixed(1)} months of overheads covered — minimum recommended: 3 months`);
@@ -103,6 +108,9 @@ function FitCheckRow({ check }: { check: FitCheck }) {
   }
   if ("worst_margin_percent" in check) {
     extras.push(`Worst-case margin: ${(check.worst_margin_percent as number).toFixed(1)}%`);
+  }
+  if ("worst_weeks_covered" in check) {
+    extras.push(`Worst-case reserves cover: ${(check.worst_weeks_covered as number).toFixed(1)} weeks`);
   }
 
   return (
