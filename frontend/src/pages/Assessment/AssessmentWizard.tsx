@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, CheckCircle, HardHat, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, HardHat, Loader2, Lock, Calculator } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,23 +46,31 @@ function blockDecimalKeys(e: React.KeyboardEvent<HTMLInputElement>) {
   if ([".", ",", "e", "E", "+", "-"].includes(e.key)) e.preventDefault();
 }
 
-function FieldInput({ field, value, onChange }: {
+function FieldInput({ field, value, onChange, disabled = false, computed = false }: {
   field: FormField;
   value: string | number;
   onChange: (v: string | number) => void;
+  disabled?: boolean;
+  computed?: boolean;
 }) {
   if (field.type === "select") {
     return (
       <div className="space-y-1.5">
-        <Label htmlFor={field.id}>
+        <Label htmlFor={field.id} className={disabled ? "text-slate-500" : ""}>
           {field.label}
-          {field.help && <span className="text-slate-500 text-xs ml-2">— {field.help}</span>}
+          {disabled && <Lock className="inline h-3 w-3 ml-1.5 text-slate-600" />}
         </Label>
         <select
           id={field.id}
           value={String(value)}
           onChange={(e) => onChange(e.target.value)}
-          className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+          disabled={disabled}
+          className={cn(
+            "flex h-10 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors",
+            disabled
+              ? "border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed"
+              : "border-slate-600 bg-slate-900 text-white"
+          )}
         >
           <option value="">Select…</option>
           {field.options?.map((o) => (
@@ -94,37 +102,69 @@ function FieldInput({ field, value, onChange }: {
     const minVal = field.allow_zero ? 0 : 1;
     return (
       <div className="space-y-1.5">
-        <Label htmlFor={field.id}>
-          {field.label}
-          {field.help && <span className="text-slate-500 text-xs ml-2">— {field.help}</span>}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={field.id} className={disabled ? "text-slate-500" : ""}>
+            {field.label}
+            {field.help && !computed && <span className="text-slate-500 text-xs ml-2">— {field.help}</span>}
+          </Label>
+          {computed && (
+            <span className="flex items-center gap-1 text-xs text-blue-400 bg-blue-900/20 border border-blue-800/50 rounded px-1.5 py-0.5">
+              <Calculator className="h-3 w-3" />auto
+            </span>
+          )}
+          {disabled && !computed && (
+            <span className="flex items-center gap-1 text-xs text-slate-500 bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5">
+              <Lock className="h-3 w-3" />locked
+            </span>
+          )}
+        </div>
         <div className="flex">
           {field.prefix && (
-            <span className="flex items-center rounded-l-lg border border-r-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">{field.prefix}</span>
+            <span className={cn(
+              "flex items-center rounded-l-lg border border-r-0 px-3 text-sm",
+              disabled ? "border-slate-700 bg-slate-800/30 text-slate-600" : "border-slate-600 bg-slate-800 text-slate-400"
+            )}>{field.prefix}</span>
           )}
           <Input
             id={field.id}
             type="number"
             min={minVal}
             step={isInt ? 1 : "any"}
-            value={value === 0 && !field.allow_zero ? "" : value === 0 ? "0" : String(value)}
+            disabled={disabled}
+            readOnly={computed}
+            value={value === 0 && !field.allow_zero && !computed ? "" : value === 0 && !computed ? "0" : String(value)}
             placeholder={field.allow_zero ? "0" : undefined}
             onChange={(e) => {
+              if (disabled || computed) return;
               const raw = e.target.value;
               if (raw === "") { onChange(0); return; }
               onChange(isInt ? (parseInt(raw, 10) || 0) : (parseFloat(raw) || 0));
             }}
-            onKeyDown={isInt ? blockDecimalKeys : undefined}
-            onPaste={isInt ? (e) => {
+            onKeyDown={isInt && !disabled && !computed ? blockDecimalKeys : undefined}
+            onPaste={isInt && !disabled && !computed ? (e) => {
               const text = e.clipboardData.getData("text");
               if (/[.,eE]/.test(text)) e.preventDefault();
             } : undefined}
-            className={cn(field.prefix ? "rounded-l-none" : "", field.suffix ? "rounded-r-none" : "")}
+            className={cn(
+              field.prefix ? "rounded-l-none" : "",
+              field.suffix ? "rounded-r-none" : "",
+              computed ? "bg-blue-950/30 border-blue-800/50 text-blue-300 cursor-default" : "",
+              disabled && !computed ? "bg-slate-800/40 border-slate-700 text-slate-500 cursor-not-allowed" : ""
+            )}
           />
           {field.suffix && (
-            <span className="flex items-center rounded-r-lg border border-l-0 border-slate-600 bg-slate-800 px-3 text-sm text-slate-400">{field.suffix}</span>
+            <span className={cn(
+              "flex items-center rounded-r-lg border border-l-0 px-3 text-sm",
+              disabled ? "border-slate-700 bg-slate-800/30 text-slate-600" : "border-slate-600 bg-slate-800 text-slate-400"
+            )}>{field.suffix}</span>
           )}
         </div>
+        {computed && (
+          <p className="text-xs text-blue-400/70">= Labour cost + Materials cost</p>
+        )}
+        {disabled && !computed && (
+          <p className="text-xs text-slate-600">Set to 0 — no upfront payment selected</p>
+        )}
       </div>
     );
   }
@@ -155,6 +195,18 @@ function MissingWarning({ missing }: { missing: string[] }) {
   );
 }
 
+// Determines whether a field is computed or locked based on current answers
+function getFieldState(fieldId: string, answers: Record<string, string | number>) {
+  if (fieldId === "total_cost") return { disabled: true, computed: true };
+  if (fieldId === "deposit_percent") {
+    const upfront = answers.upfront_payment;
+    if (!upfront || upfront === "no" || upfront === "unsure") {
+      return { disabled: true, computed: false };
+    }
+  }
+  return { disabled: false, computed: false };
+}
+
 function SectionForm({ section, answers, onChange }: {
   section: FormSection;
   answers: Record<string, string | number>;
@@ -167,15 +219,20 @@ function SectionForm({ section, answers, onChange }: {
         <p className="text-slate-400 text-sm mt-1">{section.description}</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {section.fields.map((field) => (
-          <div key={field.id} className={field.type === "textarea" ? "sm:col-span-2" : ""}>
-            <FieldInput
-              field={field}
-              value={answers[field.id] ?? ""}
-              onChange={(v) => onChange(field.id, v)}
-            />
-          </div>
-        ))}
+        {section.fields.map((field) => {
+          const { disabled, computed } = getFieldState(field.id, answers);
+          return (
+            <div key={field.id} className={field.type === "textarea" ? "sm:col-span-2" : ""}>
+              <FieldInput
+                field={field}
+                value={answers[field.id] ?? ""}
+                onChange={(v) => onChange(field.id, v)}
+                disabled={disabled}
+                computed={computed}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -196,7 +253,20 @@ export default function AssessmentWizard() {
   const createMutation = useCreateAssessment();
 
   const setAnswer = (id: string, v: string | number) =>
-    setAnswers((prev) => ({ ...prev, [id]: v }));
+    setAnswers((prev) => {
+      const next = { ...prev, [id]: v };
+      // Auto-compute total_cost whenever labour or materials change
+      if (id === "labour_cost" || id === "materials_cost") {
+        const labour = Number(id === "labour_cost" ? v : prev.labour_cost ?? 0);
+        const materials = Number(id === "materials_cost" ? v : prev.materials_cost ?? 0);
+        next.total_cost = labour + materials;
+      }
+      // Lock deposit to 0 when upfront payment is not confirmed
+      if (id === "upfront_payment" && (v === "no" || v === "unsure" || v === "")) {
+        next.deposit_percent = 0;
+      }
+      return next;
+    });
 
   const getSection = (id: string) => questions?.sections.find((s) => s.id === id);
 
@@ -206,10 +276,16 @@ export default function AssessmentWizard() {
     return section.fields
       .filter((f) => f.required !== false)
       .filter((f) => {
+        // total_cost is auto-computed — skip it (will be valid if labour+materials are filled)
+        if (f.id === "total_cost") return false;
+        // deposit_percent is locked to 0 when upfront is no/unsure — skip it
+        if (f.id === "deposit_percent") {
+          const upfront = answers.upfront_payment;
+          if (!upfront || upfront === "no" || upfront === "unsure") return false;
+        }
         const val = answers[f.id];
         if (f.type === "number") {
           if (val === undefined || val === "" || val === null) return true;
-          // 0 is only acceptable when the field explicitly allows it
           if (!f.allow_zero && Number(val) === 0) return true;
           return false;
         }
