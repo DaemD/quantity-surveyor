@@ -190,6 +190,45 @@ export default function ResultsDisplay({ assessment }: { assessment: Assessment 
   });
 
   const { job_quality, fit, status, verdict } = results;
+  const hasRequiredShape =
+    job_quality &&
+    typeof job_quality === "object" &&
+    typeof (job_quality as any).label === "string" &&
+    fit &&
+    typeof fit === "object" &&
+    typeof (fit as any).label === "string";
+
+  if (!hasRequiredShape) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-5">
+          <p className="text-white text-sm font-semibold mb-1">This assessment report can’t be displayed.</p>
+          <p className="text-slate-400 text-sm">
+            It looks like this saved assessment has an older or incomplete results format (missing Job Quality / Fit details).
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onClick={() => window.location.reload()}>
+              Refresh
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={explainMutation.isPending}
+              onClick={() => explainMutation.mutate()}
+            >
+              {explainMutation.isPending ? "Requesting summaries…" : "Try generating summaries"}
+            </Button>
+          </div>
+          {explainMutation.isError && (
+            <p className="mt-2 text-xs text-red-400">
+              {explainMutation.error instanceof Error ? explainMutation.error.message : "Request failed"}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const overallCfg = OVERALL_CONFIG[status];
   const jqCfg = JQ_CONFIG[job_quality.label];
   const fitCfg = FIT_CONFIG[fit.label];
