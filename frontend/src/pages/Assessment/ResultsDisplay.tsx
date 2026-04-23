@@ -1,8 +1,11 @@
-import { CheckCircle, XCircle, AlertTriangle, Star, TrendingUp, Users, MinusCircle } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CheckCircle, XCircle, AlertTriangle, Star, TrendingUp, Users, MinusCircle, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { Assessment, AssessmentStatus, FitCheck, JobQualityLabel, FitLabel } from "@/types";
+import type { Assessment, AssessmentExplanations, AssessmentStatus, FitCheck, JobQualityLabel, FitLabel } from "@/types";
+import { postExplainAssessment } from "@/api/assessments";
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -152,16 +155,45 @@ function FitCheckRow({ check }: { check: FitCheck }) {
   );
 }
 
+function PlainEnglishPanel({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="mt-4 rounded-lg border border-slate-700/80 bg-slate-950/60 p-4">
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">{title}</p>
+      <div className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">{body}</div>
+    </div>
+  );
+}
+
+function explanationState(ex: AssessmentExplanations | null | undefined) {
+  const o = ex && typeof ex === "object" ? ex : null;
+  const pending = Boolean(o && o.status === "pending");
+  const disabled = Boolean(o && o.disabled);
+  const err = typeof o?.error === "string" && o.error.length > 0;
+  const jq = typeof o?.job_quality_plain === "string" ? o.job_quality_plain.trim() : "";
+  const ft = typeof o?.fit_plain === "string" ? o.fit_plain.trim() : "";
+  return { o, pending, disabled, err, jq, ft };
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function ResultsDisplay({ assessment }: { assessment: Assessment }) {
   const results = assessment.results;
   if (!results) return null;
 
+  const queryClient = useQueryClient();
+  const explainMutation = useMutation({
+    mutationFn: () => postExplainAssessment(assessment.id),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["assessment", assessment.id], data);
+      void queryClient.invalidateQueries({ queryKey: ["assessment", assessment.id] });
+    },
+  });
+
   const { job_quality, fit, status, verdict } = results;
   const overallCfg = OVERALL_CONFIG[status];
   const jqCfg = JQ_CONFIG[job_quality.label];
   const fitCfg = FIT_CONFIG[fit.label];
+  const exState = explanationState(assessment.explanations);
 
   return (
     <div className="space-y-6">
@@ -193,6 +225,61 @@ export default function ResultsDisplay({ assessment }: { assessment: Assessment 
           </div>
         )}
       </div>
+
+      {(exState.pending || exState.disabled || exState.err || (!assessment.explanations && results)) && (
+        <div
+          className={cn(
+            "rounded-lg border px-4 py-3 flex flex-wrap items-center gap-3 text-sm",
+            exState.err ? "border-amber-800/60 bg-amber-950/20 text-amber-200" : "border-slate-700 bg-slate-900/40 text-slate-300",
+          )}
+        >
+          {exState.pending && (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400 flex-shrink-0" />
+              <span>Writing plain-English summaries…</span>
+            </>
+          )}
+          {exState.disabled && (
+            <span className="text-slate-400">
+              Plain-English summaries are not enabled on this server (no API key configured).
+            </span>
+          )}
+          {exState.err && (
+            <>
+              <span>Could not generate summaries.</span>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="border-amber-700 text-amber-100"
+                disabled={explainMutation.isPending}
+                onClick={() => explainMutation.mutate()}
+              >
+                {explainMutation.isPending ? "Retrying…" : "Retry"}
+              </Button>
+            </>
+          )}
+          {!assessment.explanations && results && !exState.pending && !exState.disabled && !exState.err && (
+            <>
+              <span className="text-slate-400">Plain-English summaries are not on this report yet.</span>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={explainMutation.isPending}
+                onClick={() => explainMutation.mutate()}
+              >
+                {explainMutation.isPending ? "Starting…" : "Generate summaries"}
+              </Button>
+            </>
+          )}
+          {explainMutation.isError && (
+            <span className="text-red-400 text-xs w-full sm:w-auto">
+              {explainMutation.error instanceof Error ? explainMutation.error.message : "Request failed"}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Two Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -249,6 +336,9 @@ export default function ResultsDisplay({ assessment }: { assessment: Assessment 
                 </div>
               </div>
             )}
+            {exState.jq ? (
+              <PlainEnglishPanel title="Plain English — Job quality" body={exState.jq} />
+            ) : null}
           </CardContent>
         </Card>
 
@@ -280,6 +370,9 @@ export default function ResultsDisplay({ assessment }: { assessment: Assessment 
                 <FitCheckRow key={check.label as string} check={check as FitCheck} />
               ))}
             </div>
+            {exState.ft ? (
+              <PlainEnglishPanel title="Plain English — Fit for your business" body={exState.ft} />
+            ) : null}
           </CardContent>
         </Card>
       </div>

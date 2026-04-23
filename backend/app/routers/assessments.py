@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import os
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 
@@ -7,6 +9,7 @@ from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.models.assessment import Assessment
 from app.schemas.assessment import AssessmentCreate, AssessmentListItem, AssessmentOut
+from app.services.explanation_service import persist_explanations
 from app.services.scoring_service import compute_scores
 
 router = APIRouter()
@@ -28,10 +31,15 @@ def _user_profile(user: User) -> dict:
 @router.post("", response_model=AssessmentOut, status_code=status.HTTP_201_CREATED)
 async def create_assessment(
     body: AssessmentCreate,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     results = compute_scores(body.answers, _user_profile(current_user))
+    has_llm = bool((os.getenv("OPENAI_API_KEY") or "").strip())
+    explanations: dict | None = (
+        {"status": "pending"} if has_llm else {"disabled": True, "reason": "llm_not_configured"}
+    )
 
     assessment = Assessment(
         user_id=current_user.id,
@@ -42,10 +50,16 @@ async def create_assessment(
         execution_score=results["execution_score"],
         answers=body.answers,
         results=results,
+        explanations=explanations,
     )
     db.add(assessment)
     await db.flush()
     await db.refresh(assessment)
+
+    if has_llm:
+        profile = _user_profile(current_user)
+        background_tasks.add_task(persist_explanations, assessment.id, profile, results)
+
     return AssessmentOut.model_validate(assessment)
 
 
@@ -77,4 +91,42 @@ async def get_assessment(
     assessment = result.scalar_one_or_none()
     if not assessment:
         raise HTTPException(status_code=404, detail="Assessment not found")
+    return AssessmentOut.model_validate(assessment)
+
+
+@router.post("/{assessment_id}/explain", response_model=AssessmentOut)
+async def request_explanations(
+    assessment_id: str,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not (os.getenv("OPENAI_API_KEY") or "").strip():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Plain-English summaries are not configured (missing OPENAI_API_KEY).",
+        )
+
+    result = await db.execute(
+        select(Assessment).where(
+            Assessment.id == assessment_id,
+            Assessment.user_id == current_user.id,
+        )
+    )
+    assessment = result.scalar_one_or_none()
+    if not assessment:
+        raise HTTPException(status_code=404, detail="Assessment not found")
+    if not assessment.results:
+        raise HTTPException(status_code=400, detail="Assessment has no results to explain")
+
+    assessment.explanations = {"status": "pending"}
+    await db.flush()
+    profile = _user_profile(current_user)
+    background_tasks.add_task(
+        persist_explanations,
+        assessment.id,
+        profile,
+        assessment.results,
+    )
+    await db.refresh(assessment)
     return AssessmentOut.model_validate(assessment)

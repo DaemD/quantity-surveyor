@@ -15,3 +15,8 @@ export async function createAssessment(data: CreateAssessmentPayload): Promise<A
   const res = await apiClient.post<Assessment>("/assessments", data);
   return res.data;
 }
+
+export async function postExplainAssessment(id: string): Promise<Assessment> {
+  const res = await apiClient.post<Assessment>(`/assessments/${id}/explain`);
+  return res.data;
+}

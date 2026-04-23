@@ -23,5 +23,6 @@ class Assessment(Base):
     execution_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     answers: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     results: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    explanations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="assessments")

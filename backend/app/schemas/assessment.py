@@ -31,5 +31,6 @@ class AssessmentOut(BaseModel):
     execution_score: int | None = None
     answers: dict[str, Any] | None = None
     results: dict[str, Any] | None = None
+    explanations: dict[str, Any] | None = None
 
     model_config = {"from_attributes": True}

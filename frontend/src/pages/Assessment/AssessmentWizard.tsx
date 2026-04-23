@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { getQuestions } from "@/api/questions";
-import { useCreateAssessment } from "@/hooks/useAssessments";
+import { useAssessment, useCreateAssessment } from "@/hooks/useAssessments";
 import type { Assessment, FormField, FormSection } from "@/types";
 import { cn } from "@/lib/utils";
 import ResultsDisplay from "./ResultsDisplay";
@@ -252,6 +252,9 @@ export default function AssessmentWizard() {
 
   const createMutation = useCreateAssessment();
 
+  const pollId = step === "results" && savedAssessment?.id ? savedAssessment.id : "";
+  const { data: polledAssessment } = useAssessment(pollId, { enabled: !!pollId });
+
   const setAnswer = (id: string, v: string | number) =>
     setAnswers((prev) => {
       const next = { ...prev, [id]: v };
@@ -318,11 +321,12 @@ export default function AssessmentWizard() {
 
   // Results step — show saved assessment results
   if (step === "results" && savedAssessment?.results) {
+    const assessmentToShow = polledAssessment ?? savedAssessment;
     return (
       <Layout>
         <div className="p-8 max-w-5xl mx-auto">
           <StepIndicator current="results" />
-          <ResultsDisplay assessment={savedAssessment} />
+          <ResultsDisplay assessment={assessmentToShow} />
           <div className="mt-8 flex gap-3">
             <Button variant="outline" onClick={() => navigate("/")}>Back to Dashboard</Button>
             <Button onClick={() => navigate(`/assessment/${savedAssessment.id}`)}>View Full Report</Button>

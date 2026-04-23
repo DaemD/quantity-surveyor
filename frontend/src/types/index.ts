@@ -142,6 +142,18 @@ export interface AssessmentResults {
   execution_score: number;
 }
 
+/** LLM plain-English summaries; shape varies by state (pending / complete / error / disabled). */
+export interface AssessmentExplanations {
+  status?: string;
+  disabled?: boolean;
+  reason?: string;
+  error?: string;
+  job_quality_plain?: string;
+  fit_plain?: string;
+  model?: string;
+  prompt_version?: string;
+}
+
 export interface Assessment {
   id: string;
   user_id: string;
@@ -153,6 +165,7 @@ export interface Assessment {
   execution_score?: number | null;
   answers?: Record<string, unknown> | null;
   results?: AssessmentResults | null;
+  explanations?: AssessmentExplanations | null;
 }
 
 export interface CreateAssessmentPayload {
